@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,8 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lint.kotlin.metadata.Visibility
 import androidx.navigation.NavController
 import com.krishal.firebaseauth.AuthState
 import com.krishal.firebaseauth.AuthViewModel
@@ -34,6 +42,9 @@ fun LoginPage(navController: NavController,authViewModel: AuthViewModel,modifier
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val authState= authViewModel.authstate.observeAsState()
+    var passwordVisible by remember {
+        mutableStateOf(false)
+    }
     val context= LocalContext.current
 
     LaunchedEffect(authState.value) {
@@ -58,7 +69,16 @@ fun LoginPage(navController: NavController,authViewModel: AuthViewModel,modifier
         Spacer(modifier=Modifier.height(16.dp))
         OutlinedTextField(value=email, onValueChange = {email=it}, label = { Text(text="enter the Email") })
         Spacer(modifier=Modifier.height(16.dp))
-        OutlinedTextField(value=password, onValueChange = {password=it}, label = { Text(text="enter the password") })
+        OutlinedTextField(value=password, onValueChange = {password=it}, label = { Text(text="enter the password") },
+            visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                var image= if(passwordVisible) Icons.Filled.Visibility  else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible=!passwordVisible}) {
+                    Icon(imageVector = image    , contentDescription = null)
+
+                }
+            }
+            )
         Spacer(modifier=Modifier.height(16.dp))
         Button(onClick = {
             authViewModel.login(email,password)
